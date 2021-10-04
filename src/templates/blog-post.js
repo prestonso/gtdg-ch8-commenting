@@ -1,5 +1,8 @@
+require("dotenv").config()
+
 import * as React from "react"
 import { Link, graphql } from "gatsby"
+import { DiscussionEmbed } from "disqus-react"
 
 import Bio from "../components/bio"
 import Layout from "../components/layout"
@@ -9,6 +12,14 @@ const BlogPostTemplate = ({ data, location }) => {
   const post = data.markdownRemark
   const siteTitle = data.site.siteMetadata?.title || `Title`
   const { previous, next } = data
+
+  const disqusConfig = {
+    shortname: process.env.GATSBY_DISQUS_SHORTNAME,
+    config: {
+      identifier: post.fields.slug,
+      title: post.frontmatter.title,
+    },
+  }
 
   return (
     <Layout location={location} title={siteTitle}>
@@ -29,6 +40,8 @@ const BlogPostTemplate = ({ data, location }) => {
           dangerouslySetInnerHTML={{ __html: post.html }}
           itemProp="articleBody"
         />
+        <hr />
+        <DiscussionEmbed {...disqusConfig} />
         <hr />
         <footer>
           <Bio />
@@ -81,6 +94,9 @@ export const pageQuery = graphql`
       id
       excerpt(pruneLength: 160)
       html
+      fields {
+        slug
+      }
       frontmatter {
         title
         date(formatString: "MMMM DD, YYYY")
